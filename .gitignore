@@ -1,0 +1,11 @@
+# .deb Packages
+*.deb
+
+.idea/*
+.DS_Store
+yq_linux_*
+yq.1
+install-man-page.sh
+*.dsc
+*.orig.tar.gz
+*.debian.tar.xz

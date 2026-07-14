@@ -1,0 +1,43 @@
+#!/usr/bin/make -f
+DEB_HOST_ARCH ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
+YQ_VERSION := $(shell dpkg-parsechangelog -S Version | sed 's/[-~].*//')
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+
+override_dh_auto_build:
+	@arch="$(DEB_HOST_ARCH)"; \
+	case "$$arch" in \
+		amd64)   YQ_RELEASE="yq_linux_amd64" ;; \
+		arm64)   YQ_RELEASE="yq_linux_arm64" ;; \
+		armhf)   YQ_RELEASE="yq_linux_arm" ;; \
+		ppc64el) YQ_RELEASE="yq_linux_ppc64le" ;; \
+		s390x)   YQ_RELEASE="yq_linux_s390x" ;; \
+		riscv64) YQ_RELEASE="yq_linux_riscv64" ;; \
+		i386)    YQ_RELEASE="yq_linux_386" ;; \
+		*) echo "Unsupported architecture: $$arch"; exit 1 ;; \
+	esac; \
+	echo "Downloading $$YQ_RELEASE for v$(YQ_VERSION)..."; \
+	wget -q "https://github.com/mikefarah/yq/releases/download/v$(YQ_VERSION)/$$YQ_RELEASE.tar.gz"; \
+	tar -xf "$$YQ_RELEASE.tar.gz"; \
+	rm -f "$$YQ_RELEASE.tar.gz"; \
+	echo "$$YQ_RELEASE" > .yq_release_name
+
+override_dh_auto_install:
+	@YQ_RELEASE=$$(cat .yq_release_name); \
+	install -D -m 755 "$$YQ_RELEASE" debian/yq/usr/bin/yq; \
+	install -D -m 644 yq.1 debian/yq/usr/share/man/man1/yq.1
+
+override_dh_auto_test:
+
+override_dh_auto_clean:
+	@if [ -f .yq_release_name ]; then \
+		YQ_RELEASE=$$(cat .yq_release_name); \
+		rm -f "$$YQ_RELEASE" .yq_release_name yq.1 install-man-page.sh || true; \
+	fi
+
+override_dh_strip:
+
+override_dh_shlibdeps:

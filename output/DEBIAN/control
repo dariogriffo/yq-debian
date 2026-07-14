@@ -1,0 +1,8 @@
+Section: utils
+Priority: optional
+Maintainer: Dario Griffo <dariogriffo@gmail.com>
+Homepage: https://github.com/mikefarah/yq
+Package: yq
+Version: yq_VERSION-BUILD_VERSION~DIST
+Architecture: SUPPORTED_ARCHITECTURES
+Description: Portable command-line YAML, JSON, XML, CSV, TOML and properties processor.

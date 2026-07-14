@@ -1,1 +1,39 @@
 # yq-debian
+
+Debian and Ubuntu packaging for [yq](https://github.com/mikefarah/yq) — a
+portable command-line YAML, JSON, XML, CSV, TOML and properties processor
+with jq-like syntax, by Mike Farah. Ships the binary and man page.
+
+Note: this is mikefarah/yq (the Go implementation), versioned 4.x — it
+supersedes the python-based `yq` wrapper found in some archives.
+
+Packages are built automatically from official upstream releases (usually
+within hours) and served from **[deb.griffo.io](https://deb.griffo.io)** for
+Debian (bookworm, trixie, forky, sid) and Ubuntu (jammy, noble, questing,
+resolute) on amd64, arm64, armhf, ppc64el, s390x, riscv64 and i386.
+
+## Install
+
+```bash
+sudo install -d -m 0755 /etc/apt/keyrings
+curl -fsSL https://deb.griffo.io/EA0F721D231FDD3A0A17B9AC7808B4DD62C41256.asc | sudo gpg --dearmor --yes -o /etc/apt/keyrings/deb.griffo.io.gpg
+echo "deb [signed-by=/etc/apt/keyrings/deb.griffo.io.gpg] https://deb.griffo.io/apt $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/deb.griffo.io.list > /dev/null
+sudo apt update
+sudo apt install -y yq
+```
+
+## How it works
+
+- `check-upstream.yml` polls upstream hourly; a new release dispatches `release.yml`.
+- `release.yml` builds binary packages (Docker, per suite × architecture, binary +
+  man page from the upstream release tarballs) and source packages (`.dsc`), then
+  publishes a GitHub release tagged `<version>+<build>`.
+- The deb.griffo.io mirror ingests published releases automatically.
+
+Manual build: `./build.sh <version> <build> [arch|all]` (e.g. `./build.sh 4.53.3 1 all`).
+
+## Links
+
+- Upstream: https://github.com/mikefarah/yq
+- Site page: https://deb.griffo.io/install-latest-yq-in-debian.html
+- Repository: https://deb.griffo.io
